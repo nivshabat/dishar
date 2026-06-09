@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Nutella Jar — Demo Restaurant</title>
+  <meta name="description" content="The iconic Nutella hazelnut spread jar, in 3D AR">
+
+  <!-- model-viewer from Google CDN -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #E8572A;
+      --dark: #1A1A1A;
+      --light: #F9F5F0;
+      --text: #2D2D2D;
+      --muted: #888;
+    }
+
+    body {
+      background: var(--light);
+      color: var(--text);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--dark);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header .restaurant-name {
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    header .brand {
+      color: var(--primary);
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    .viewer-section {
+      position: relative;
+      width: 100%;
+      background: #222;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 55vw;
+      max-height: 420px;
+      min-height: 280px;
+      --poster-color: #222;
+    }
+
+    /* Hide default AR button — we use our own */
+    model-viewer::part(default-ar-button) { display: none; }
+
+    /* No AR fallback message */
+    .no-ar-msg {
+      display: none;
+      background: #333;
+      color: #aaa;
+      text-align: center;
+      padding: 8px;
+      font-size: 0.8rem;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px 20px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .dish-info h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--dark);
+      line-height: 1.2;
+    }
+    .dish-info .price {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .dish-info .description {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* AR Button */
+    .ar-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .ar-btn:active { transform: scale(0.97); }
+    .ar-btn svg { width: 24px; height: 24px; flex-shrink: 0; }
+
+    .ar-btn.disabled {
+      background: #ccc;
+      cursor: default;
+    }
+
+    .ar-hint {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    footer {
+      padding: 16px;
+      text-align: center;
+      font-size: 0.72rem;
+      color: #bbb;
+      border-top: 1px solid #eee;
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="restaurant-name">Demo Restaurant</span>
+  <span class="brand">DishAR ✦</span>
+</header>
+
+<div class="viewer-section">
+  <model-viewer
+    id="dish-viewer"
+    src="model.glb"
+    ios-src="model.usdz"
+    alt="Nutella Jar"
+    auto-rotate
+    camera-controls
+    shadow-intensity="1"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-scale="fixed"
+    loading="eager"
+    reveal="auto"
+  ></model-viewer>
+</div>
+
+<div class="no-ar-msg" id="no-ar-msg">
+  המכשיר שלך מציג את המנה בתלת-מימד. לחוויית AR מלאה (המנה על השולחן), דרוש מכשיר תואם AR.
+</div>
+
+<div class="content">
+  <div class="dish-info">
+    <h1>Nutella Jar</h1>
+    {{#if PRICE}}<span class="price">₪</span>{{/if}}
+    {{#if DISH_DESCRIPTION}}<p class="description">The iconic Nutella hazelnut spread jar, in 3D AR</p>{{/if}}
+  </div>
+
+  <a id="ar-link" class="ar-btn" href="#" onclick="launchAR(event)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+      <path d="M2 17l10 5 10-5"/>
+      <path d="M2 12l10 5 10-5"/>
+    </svg>
+    ראה את המנה על השולחן שלך
+  </a>
+
+  <p class="ar-hint">✦ ללא הורדת אפליקציה — פועל ישירות בדפדפן</p>
+</div>
+
+<footer>
+  חוויית AR מופעלת על ידי <a href="#">DishAR</a>
+</footer>
+
+<script>
+  const viewer = document.getElementById('dish-viewer');
+
+  function launchAR(e) {
+    e.preventDefault();
+    if (!viewer) return;
+    // Try WebXR / Scene Viewer / Quick Look via model-viewer's built-in AR
+    const arBtn = viewer.shadowRoot && viewer.shadowRoot.querySelector('[slot="ar-button"]');
+    if (viewer.canActivateAR) {
+      viewer.activateAR();
+    } else {
+      // Show the no-AR message
+      document.getElementById('no-ar-msg').style.display = 'block';
+      const btn = document.getElementById('ar-link');
+      btn.classList.add('disabled');
+      btn.textContent = 'AR אינו זמין במכשיר זה — ניתן לצפות בתלת-מימד למעלה';
+    }
+  }
+
+  // If AR is not available at all, update button gracefully
+  viewer.addEventListener('ar-status', (e) => {
+    if (e.detail.status === 'failed') {
+      document.getElementById('no-ar-msg').style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>
